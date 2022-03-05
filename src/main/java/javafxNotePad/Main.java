@@ -1,4 +1,4 @@
-package simplemodel;
+package javafxNotePad;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,19 +21,15 @@ import java.util.Arrays;
 
 public class Main extends Application {
     private final BorderPane root = new BorderPane(); // Application visuals
-
     private final FileManipulator fileManipulator = new FileManipulator();
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("NotePad");
         primaryStage.getIcons().add(new Image("file:src\\main\\resources\\icon.png")); // notepad icon
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() { // close operation request
-            @Override
-            public void handle(WindowEvent t) {
-                Platform.exit();
-                System.exit(0);
-            }
+        primaryStage.setOnCloseRequest((WindowEvent t) -> { // close operation request
+            Platform.exit();
+            System.exit(0);
         });
 
         // bottom status bar
@@ -82,7 +78,7 @@ public class Main extends Application {
                 fileManipulator.openFile(primaryStage);
                 notepadArea.setText(fileManipulator.getTextFromOpenedFile());
             } catch (IOException e) {
-                ioAlert(e.getMessage() + "\n\n" + Arrays.toString(e.getStackTrace()));
+                Alerter.ioAlert(e.getMessage());
             }
             notepadStatus.setReady();
             documentStatus.setSaved();
@@ -94,7 +90,7 @@ public class Main extends Application {
             try {
                 fileManipulator.saveFile(notepadArea.getText());
             } catch (Exception e) {
-               ioAlert("File can not be saved!" + "\n\n" + Arrays.toString(e.getStackTrace()));
+                Alerter.ioAlert("File can not be saved!");
             }
             documentStatus.setSaved();
             notepadStatus.setReady();
@@ -116,28 +112,10 @@ public class Main extends Application {
         Menu menuFile = new Menu("Help");
 
         MenuItem showCredits = new MenuItem("About the application");
-        showCredits.setOnAction((ActionEvent t) -> creditsAlert());
+        showCredits.setOnAction((ActionEvent t) -> Alerter.creditsAlert());
 
         menuFile.getItems().addAll(showCredits);
         return menuFile;
-    }
-
-    private void ioAlert(String text) { // overload method
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("I/O Error");
-        alert.setGraphic(null);
-        alert.setContentText(text);
-        alert.getDialogPane().setMinSize(200, 100);
-        alert.showAndWait();
-    }
-
-    private void creditsAlert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("About the application");
-        alert.setGraphic(null);
-        alert.setContentText("Creator: Mikhail Lavrov");
-        alert.getDialogPane().setMinSize(200, 100);
-        alert.showAndWait();
     }
 
     public static void main(String[] args) {
